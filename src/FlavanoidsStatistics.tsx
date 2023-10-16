@@ -1,34 +1,55 @@
 import React, { useEffect, useState } from 'react';
+import { WineDataItem } from './types/sharedTypes';
+import "./flav.css"
 
-// wineData is now an object containing your JSON data
+
+// interface WineDataRecord {
+//   Alcohol: string;
+//   Flavanoids: number;
+// }
+
+// interface WineDataItem {
+//   Alcohol: number;
+//   MalicAcid: number;
+//   Ash: number;
+//   AlcalinityOfAsh: number;
+//   Magnesium: number;
+//   TotalPhenols: number;
+//   Flavanoids: number;
+//   NonflavanoidPhenols: number;
+//   Proanthocyanins: number;
+//   ColorIntensity: number;
+//   Hue: number;
+//   OD280OD315OfDilutedWines: number;
+//   Unknown: number;
+// }
 
 
-interface WineDataRecord {
-  Alcohol: string;
-  Flavanoids: number;
+interface GammaStatisticsTableProps {
+  data: WineDataItem[];
 }
 
-const FlavanoidsStatistics: React.FC = () => {
-  const [data, setData] = useState<WineDataRecord[]>([]);
+const FlavanoidsStatistics: React.FC<GammaStatisticsTableProps> = ({data }) => {
+  // const [data, setData] = useState<WineDataRecord[]>([]);
 
-  useEffect(() => {
-    // Load the data from the local JSON file in the same folder
-    fetch('wineData.json')
-      // .then(res => console.log(res, "----data"))
-      .then((response) => response.json())
-      // .then((wineData) => setData(wineData))
-      .then((wineData) => {
-        setData(wineData);
-        console.log(wineData); // Log the data
-      })
-      .catch((error) => console.error('Error loading data: ', error));
-  }, []);
+  // useEffect(() => {
+  //   // Load the data from the local JSON file in the same folder
+  //   fetch('wineData.json')
+  //     // .then(res => console.log(res, "----data"))
+  //     .then((response) => response.json())
+  //     // .then((wineData) => setData(wineData))
+  //     .then((wineData) => {
+  //       setData(wineData);
+  //       // console.log(wineData); // Log the data
+  //     })
+  //     .catch((error) => console.error('Error loading data: ', error));
+  // }, []);
 
   const calculateClassStatistics = () => {
     const classStats: { [className: string]: number[] } = {};
 
     // Group data by Alcohol class
-    data.forEach((record) => {
+    data.forEach((record : WineDataItem) => {
       const alcoholClass = record.Alcohol;
       const flavanoidsValue = record.Flavanoids;
 
@@ -47,7 +68,7 @@ const FlavanoidsStatistics: React.FC = () => {
 
       // Calculate mean
       const mean = classData.reduce((sum, value) => parseFloat(sum as any) + parseFloat(value as any), 0) / classData.length;
-      console.log(classData,"===",mean)
+      // console.log(classData,"===",mean)
 
       // Calculate median
       classData.sort((a, b) => a - b);
@@ -85,8 +106,8 @@ const FlavanoidsStatistics: React.FC = () => {
   const classStatistics = calculateClassStatistics();
 
   return (
-    <div>
-      <table border={1}>
+    <div  className="table-card">
+      <table className="custom-table">
         <thead>
           <tr>
             <th>Measure</th>
