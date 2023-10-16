@@ -46,7 +46,8 @@ const FlavanoidsStatistics: React.FC = () => {
       const classData = classStats[className];
 
       // Calculate mean
-      const mean = classData.reduce((sum, value) => sum + value, 0) / classData.length;
+      const mean = classData.reduce((sum, value) => parseFloat(sum as any) + parseFloat(value as any), 0) / classData.length;
+      console.log(classData,"===",mean)
 
       // Calculate median
       classData.sort((a, b) => a - b);
@@ -98,20 +99,20 @@ const FlavanoidsStatistics: React.FC = () => {
           <tr>
             <th>Flavanoids Mean</th>
             {Object.keys(classStatistics).map((className, index) => (
-              <td key={index}>{classStatistics[className].mean.toFixed(2)}</td>
+              <td key={index}>{classStatistics[className].mean.toFixed(3)}</td>
             ))}
           </tr>
           <tr>
             <th>Flavanoids Median</th>
             {Object.keys(classStatistics).map((className, index) => (
-              <td key={index}>{classStatistics[className].median.toFixed(2)}</td>
+              <td key={index}>{classStatistics[className].median.toFixed(3)}</td>
             ))}
           </tr>
           <tr>
             <th>Flavanoids Mode</th>
             {Object.keys(classStatistics).map((className, index) => (
               <td key={index}>
-                {classStatistics[className].mode?.toFixed(2) ?? 'N/A'}
+                {classStatistics[className].mode?.toFixed(3) ?? 'N/A'}
               </td>
             ))}
           </tr>
