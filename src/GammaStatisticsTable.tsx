@@ -29,96 +29,104 @@ interface GammaStatisticsTableProps {
 }
 
 const GammaStatisticsTable: React.FC<GammaStatisticsTableProps> = ({ data }) => {
-    const calculateMean = (arr: number[]): number => {
-        if (arr.length === 0) return 0;
-        const sum = arr.reduce((acc, value) => acc + value, 0);
-        return (sum / arr.length);
-    };
 
-    const calculateMedian = (arr: number[]): number => {
-        const sortedArr = [...arr].sort((a, b) => a - b);
-        const middle = Math.floor(sortedArr.length / 2);
+    const calculateClassStatistics = () => {
+        const classStats: { [className: string]: number[] } = {};
+    
+        // Group data by Alcohol class
+        data.forEach((record : WineDataItem) => {
+          const alcoholClass = record.Alcohol;
+          const gammaValues = (record.Ash * record.Hue) / record.Magnesium
 
-        if (sortedArr.length % 2 === 0) {
-            return (sortedArr[middle - 1] + sortedArr[middle]) / 2;
-        } else {
-            return sortedArr[middle];
-        }
-    };
-
-
-    const calculateMode = (arr: number[]): number => {
-        if (arr.length === 0) return 0;
-
-        const frequencyMap: { [key: number]: number } = {};
-        let maxFrequency = 0;
-        let modes: number[] = [];
-
-        arr.forEach((item) => {
-            frequencyMap[item] = (frequencyMap[item] || 0) + 1;
-            if (frequencyMap[item] > maxFrequency) {
-                maxFrequency = frequencyMap[item];
-                modes = [item];
-            } else if (frequencyMap[item] === maxFrequency) {
-                modes.push(item);
-            }
+          if (!classStats[alcoholClass]) {
+            classStats[alcoholClass] = [];
+          }
+    
+          classStats[alcoholClass].push(gammaValues);
         });
+    
+        const results: { [className: string]: { mean: number; median: number; mode: number | null } } = {};
+    
+        // Calculate statistics for each class
+        for (const className in classStats) {
+          const classData = classStats[className];
+    
+          // Calculate mean
+          const mean = classData.reduce((sum, value) => parseFloat(sum as any) + parseFloat(value as any), 0) / classData.length;
+          // console.log(classData,"===",mean)
+    
+          // Calculate median
+          classData.sort((a, b) => a - b);
+          const median = classData[Math.floor(classData.length / 2)];
+    
+          // Calculate mode
+          const counts: { [value: number]: number } = {};
+          let maxCount = 0;
+          let mode = null;
+    
+          for (const value of classData) {
+            if (!counts[value]) {
+              counts[value] = 1;
+            } else {
+              counts[value]++;
+            }
+    
+            if (counts[value] > maxCount) {
+              maxCount = counts[value];
+              mode = value;
+            }
+          }
+    
+          results[className] = {
+            mean,
+            median,
+            mode,
+          };
+        }
+    
+        return results;
+      };
+  const classStatistics = calculateClassStatistics();
 
-        return modes[0]; // Return the first mode in the array.
-    };
-
-    const classes = [1, 2, 3];
-
-
-    const classWiseGamma: ClassWiseGamma[] = classes.map((classLabel) => {
-        const filteredData = data.filter((item) => item.Unknown === classLabel);
-        const gammaForClass = filteredData.map(
-            (item) => (item.Ash * item.Hue) / item.Magnesium
-        );
-        return {
-            classLabel,
-            mean: parseFloat(calculateMean(gammaForClass).toFixed(3)),
-            median: parseFloat(calculateMedian(gammaForClass).toFixed(3)),
-            mode: parseFloat(calculateMode(gammaForClass).toFixed(3)),
-        };
-    });
-    console.log(classWiseGamma, "data_")
-
+    
 
     return (
-        <div className="table-card">
-            <table className="custom-table">
-                <thead>
-                    <tr>
-                        <th>Measure</th>
-                        {classes.map((classLabel) => (
-                            <th key={classLabel}>Class {classLabel}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Gamma</td>
-                        {classWiseGamma.map((classData) => (
-                            <td key={classData.classLabel}>{classData.mean}</td>
-                        ))}
-                    </tr>
-                    <tr>
-                        <td>Median</td>
-                        {classWiseGamma.map((classData) => (
-                            <td key={classData.classLabel}>{classData.median}</td>
-                        ))}
-                    </tr>
-                    <tr>
-                        <td>Mode</td>
-                        {classWiseGamma.map((classData) => (
-                            <td key={classData.classLabel}>{classData.mode}</td>
-                        ))}
-                    </tr>
-                </tbody>
-            </table>
+        <div  className="table-card">
+          <table className="custom-table">
+            <thead>
+              <tr>
+                <th>Measure</th>
+                {Object.keys(classStatistics).map((className, index) => (
+                  <th key={index}>Class {className}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Gamma Mean</th>
+                {Object.keys(classStatistics).map((className, index) => (
+                  <td key={index}>{classStatistics[className].mean.toFixed(3)}</td>
+                ))}
+              </tr>
+              <tr>
+                <th>Gamma Median</th>
+                {Object.keys(classStatistics).map((className, index) => (
+                  <td key={index}>{classStatistics[className].median.toFixed(3)}</td>
+                ))}
+              </tr>
+              <tr>
+                <th>Gamma Mode</th>
+                {Object.keys(classStatistics).map((className, index) => (
+                  <td key={index}>
+                    {classStatistics[className].mode?.toFixed(3) ?? 'N/A'}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
         </div>
-    );
+      );
+
 };
 
 export default GammaStatisticsTable;
