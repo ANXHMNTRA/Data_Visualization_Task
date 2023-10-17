@@ -1,55 +1,46 @@
 import React from 'react';
-import { WineDataItem, ClassWiseGamma } from '../../types/sharedTypes';
-import { calculateClassStatistics } from '../../utils/statisticsUtils';
-// import { renderTableHeader, renderTableData } from '../../utils/tableUtils';
+import { WineDataItem } from '../../types/sharedTypes';
+import { calculateGammaStatistics } from '../../utils/statisticsUtils';
 
- function renderTableHeader(data: Record<string, any> | ClassWiseGamma[]) {
-  return (
-    <tr>
-      <th>Measure</th>
-      {Object.keys(data).map((className, index) => (
-        <th key={index}>Class {className}</th>
-      ))}
-    </tr>
-  );
-};
-
- function renderTableData(data: Record<string, any> | ClassWiseGamma[], statType: string) {
-  return (
-    <tr>
-      <td>{statType}</td>
-      {Object.keys(data).map((className, index) => (
-        <td key={index}>{(data as Record<string, any>)[className][statType]}</td>
-      ))}
-    </tr>
-  );
-}
-const GammaStatisticsTable: React.FC<{ data: WineDataItem[] }> = ({ data }) => {
-    
-    const classes = [1, 2, 3];
-  const classWiseGamma = calculateClassStatistics(data);
+function GammaStatisticsTable({ data }: { data: WineDataItem[] }) {
+  const classStatistics = calculateGammaStatistics(data);
 
   return (
-    <div>
-      <table border={1}>
-        <thead>{renderTableHeader(classWiseGamma)}</thead>
+    <div  className="table-card">
+      <table className="custom-table">
+        <thead>
+          <tr>
+            <th>Measure</th>
+            {Object.keys(classStatistics).map((className, index) => (
+              <th key={index}>Class {className}</th>
+            ))}
+          </tr>
+        </thead>
         <tbody>
           <tr>
-            <td>Gamma</td>
-            {renderTableData(classWiseGamma, 'mean')}
+            <th>Gamma Mean</th>
+            {Object.keys(classStatistics).map((className, index) => (
+              <td key={index}>{classStatistics[className].mean.toFixed(3)}</td>
+            ))}
           </tr>
           <tr>
-            <td>Median</td>
-            {renderTableData(classWiseGamma, 'median')}
+            <th>Gamma Median</th>
+            {Object.keys(classStatistics).map((className, index) => (
+              <td key={index}>{classStatistics[className].median.toFixed(3)}</td>
+            ))}
           </tr>
           <tr>
-            <td>Mode</td>
-            {renderTableData(classWiseGamma, 'mode')}
+            <th>Gamma Mode</th>
+            {Object.keys(classStatistics).map((className, index) => (
+              <td key={index}>
+                {classStatistics[className].mode?.toFixed(3) ?? 'N/A'}
+              </td>
+            ))}
           </tr>
         </tbody>
       </table>
     </div>
   );
-};
+}
 
 export default GammaStatisticsTable;

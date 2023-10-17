@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-// import FlavanoidsStatistics from './components/FlavanoidsStatistics/FlavanoidsStatistics';
-// import GammaStatisticsTable from './components/GammaStatisticsTable/GammaStatisticsTable';
+import FlavanoidsStatistics from './components/FlavanoidsStatistics/FlavanoidsStatistics';
+import GammaStatisticsTable from './components/GammaStatisticsTable/GammaStatisticsTable';
 
 import { WineDataItem } from './types/sharedTypes'; // Import the WineDataItem type
-import FlavanoidsStatistics from './FlavanoidsStatistics';
-import GammaStatisticsTable from './GammaStatisticsTable';
 import './App.css';
+import "./flav.css"
+
 
 function App() {
   const [data, setData] = useState<WineDataItem[]>([]);

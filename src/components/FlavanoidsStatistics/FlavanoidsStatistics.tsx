@@ -1,52 +1,47 @@
 import React from 'react';
 import { WineDataItem } from '../../types/sharedTypes';
-import { calculateClassStatistics } from '../../utils/statisticsUtils';
-import { ClassWiseGamma } from '../../types/sharedTypes';
+import { calculateFlavanoidsStatistics } from '../../utils/statisticsUtils';
 
-const FlavanoidsStatistics: React.FC<{ data: WineDataItem[] }> = ({ data }) => {
-  const classStatistics = calculateClassStatistics(data);
-
-  // Function to render the table header
-  const renderTableHeader = (data: Record<string, any> | ClassWiseGamma[]) => (
-    <tr>
-      <th>Measure</th>
-      {Object.keys(data).map((className, index) => (
-        <th key={index}>Class {className}</th>
-      ))}
-    </tr>
-  );
-
-  // Function to render the table data for a specific statType
-  const renderTableData = (data: Record<string, any> | ClassWiseGamma[], statType: string) => (
-    <tr>
-      <td>{statType}</td>
-      {Object.keys(data).map((className, index) => (
-        <td key={index}>{(data as Record<string, any>)[className][statType]}</td>
-      ))}
-    </tr>
-  );
+function FlavanoidsStatistics({ data }: { data: WineDataItem[] }) {
+  const classStatistics = calculateFlavanoidsStatistics(data);
 
   return (
-    <div>
-      <table border={1}>
-        <thead>{renderTableHeader(classStatistics)}</thead>
+    <div  className="table-card">
+      <table className="custom-table">
+        <thead>
+          <tr>
+            <th>Measure</th>
+            {Object.keys(classStatistics).map((className, index) => (
+              <th key={index}>Class {className}</th>
+            ))}
+          </tr>
+        </thead>
         <tbody>
           <tr>
             <th>Flavanoids Mean</th>
-            {renderTableData(classStatistics, 'mean')}
+            {Object.keys(classStatistics).map((className, index) => (
+              <td key={index}>{classStatistics[className].mean.toFixed(3)}</td>
+            ))}
           </tr>
           <tr>
             <th>Flavanoids Median</th>
-            {renderTableData(classStatistics, 'median')}
+            {Object.keys(classStatistics).map((className, index) => (
+              <td key={index}>{classStatistics[className].median.toFixed(3)}</td>
+            ))}
           </tr>
           <tr>
             <th>Flavanoids Mode</th>
-            {renderTableData(classStatistics, 'mode')}
+            {Object.keys(classStatistics).map((className, index) => (
+              <td key={index}>
+                {classStatistics[className].mode?.toFixed(3) ?? 'N/A'}
+              </td>
+            ))}
           </tr>
         </tbody>
       </table>
     </div>
   );
-};
+  
+}
 
 export default FlavanoidsStatistics;
